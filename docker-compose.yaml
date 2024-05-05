@@ -1,0 +1,49 @@
+version: "77"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    restart: always
+    depends_on: 
+     - pg
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/home/node/type
+    networks:
+     - type 
+
+  pg:
+    container_name: pg
+    image: postgres
+    restart: always
+    environment: 
+     POSTGRES_PASSWORD: root
+     POSTGRES_USER: root
+     POSTGRES_DB: type
+    ports:
+      - 5432:5432
+    volumes:
+     -  type:/var/lib/postgresql/data 
+    networks:
+      -  type 
+  teste-pgadmin-compose:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "renatogroff@yahoo.com.br"
+      PGADMIN_DEFAULT_PASSWORD: "PgAdmin2019!"
+    ports:
+      - "16543:80"
+    depends_on:
+      - pg
+    networks:
+      - type
+
+networks: 
+  type :
+    driver: bridge
+volumes:
+  type :
+   
