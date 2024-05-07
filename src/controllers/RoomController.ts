@@ -1,10 +1,8 @@
 import { Request, Response } from 'express'
 import { RoomRepository } from '../repositories/RoomRepository'
+import { BadRequestError } from '../helpers/api-errors'
 import { VideoRepository } from '../repositories/VideoRepository'
 import { subjectRepository } from '../repositories/SubjectRepository'
-import { Subject } from 'typeorm/persistence/Subject'
-import { Room } from '../entities/Room'
-
 
 export class RoomController {
 	async create(req: Request, res: Response) {
@@ -19,17 +17,13 @@ export class RoomController {
 		const { title, url } = req.body
 		const { idRoom } = req.params
 
-		const room = await RoomRepository.findOne({
-			where: { id: Number(idRoom) },
-		});
+		const room = await RoomRepository.findOneBy({ id: Number(idRoom) })
+
 		if (!room) {
-			return res.status(404).json({ msg: "Room não encontrado" });
+			throw new BadRequestError('Aula não existe')
 		}
 
-	    if(!room){
-			res.status
-		}
-		const newVideo = await VideoRepository.create({
+		const newVideo = VideoRepository.create({
 			title,
 			url,
 			room,
@@ -46,15 +40,19 @@ export class RoomController {
 
 		const room = await RoomRepository.findOneBy({ id: Number(idRoom) })
 
-	
+		if (!room) {
+			throw new BadRequestError('Aula não existe')
+		}
 
 		const subject = await subjectRepository.findOneBy({
 			id: Number(subject_id),
 		})
 
-	
+		if (!subject) {
+			throw new BadRequestError('Disciplina não existe')
+		}
 
-		const roomUpdate : any | null = {
+		const roomUpdate = {
 			...room,
 			subjects: [subject],
 		}
